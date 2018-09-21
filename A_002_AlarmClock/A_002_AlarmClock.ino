@@ -66,15 +66,15 @@ void setup() {
 
 }
 
-int wake1 = 1845;
-int wake2 = 1825;
+int wake1 = -1;
+int wake2 = -1;
 
 void loop() {
-  Datetime_ now = rtc.now(); // Current time
+  DateTime now = rtc.now(); // Current time
   int timeint = int(now.hour())*100 + int(now.minute());
   matrix_time(timeint, 5);
   
-  if ((timeint == wake1 || timeint == wake2)) 
+  if ((timeint == wake1 || timeint == wake2)) //wake routine
   {
     if (!buzzed) 
     {
@@ -85,52 +85,56 @@ void loop() {
       display.display();
       matrix.blinkRate(1);
       matrix.setBrightness(15);
-      buzz(5);
+      buzz(10);
+      delay(10000);
+      matrix.blinkRate(0);
     }
   } else {
     if (buzzed) 
     {
       buzzed = false;  
-      matrix.blinkRate(0);
       matrix.setBrightness(1);
     }
   }
 
   String time_ = String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second());
-  display.clearDisplay();
-  display.setTextSize(2);
-  display.setTextColor(WHITE);
-  display.setCursor(0,0);
-  display.println(time);
-  display.display();
+  oled_time();
   if (digitalRead(button3_menu) == HIGH) 
   {
-    buzz(2);
+    buzz_full(2, 50, 50);
     menu();
+    buzz_full(2, 200, 100);
+    delay(1000);
   }
 }
 
 void buzz(int n) {
+  buzz_full(n, 500, 500);
+}
+
+void buzz_full(int n, int on, int off) {
   for(int i = 0; i < n; i++)
   {
     digitalWrite(buzzer, HIGH);
-    delay(500);
+    delay(on);
     digitalWrite(buzzer, LOW);
-    delay(500);
+    delay(off);
   }
 }
 
 void menu() {
   int from_right = 0;
-  int time_ = 0600;
+  int time_ = 600;
   bool button3_state = true;
+  matrix_time(time_, 15);
   while(true) 
   {
+    oled_time();
     int grow = 1;
     int grow_counter = 0;
+    int delay_input = 500;
     while(digitalRead(button1_up) == HIGH) 
     {
-      time_ = over_underflow(time);
       if ( grow_counter > 5 && grow < 20) 
       {
          grow += 5;
@@ -138,22 +142,25 @@ void menu() {
       } else {
         grow_counter++;
       }
-      time_ += grow*10^from_right;
-      delay(100);
+      time_ += grow*pow(10, from_right);
+      time_ = over_underflow(time_);
+      matrix_time(time_, 15);
+      delay(delay_input);
     }
     grow = 1;
     while(digitalRead(button2_down) == HIGH) 
     {
-      time_ = over_underflow(time);
       if ( grow_counter > 5 && grow < 20) 
       {
-         grow += 5;
+         grow += 15;
          grow_counter = 0;
       } else {
         grow_counter++;
       }
-      time_ -= grow*10^from_right;
-      delay(100);
+      time_ -= grow*pow(10, from_right);
+      time_ = over_underflow(time_);
+      matrix_time(time_, 15);
+      delay(delay_input);
     }
     if(digitalRead(button4_left) == HIGH)
     {
@@ -162,6 +169,7 @@ void menu() {
       {
         from_right = 3;
       }
+      delay(250);
     }
     if(digitalRead(button5_right) == HIGH)
     {
@@ -170,8 +178,8 @@ void menu() {
       {
         from_right = 0;
       }
+      delay(250);
     }
-    matrix_time(time_, 15);
     if(digitalRead(button3_menu) == HIGH)
     {
       if(!button3_state) 
@@ -186,31 +194,54 @@ void menu() {
   }
 }
 
-int over_underflow(int time) {
-  int hours = time/100;
-  int minutes = time%100;
+int over_underflow(int time_) {
+  int hours = time_/100;
+  int minutes = time_%100;
   if (minutes >= 60) 
   {
-      time_ = 100*(hours+1)
+      time_ = 100*(hours+1);
   }
-  if (minutes <= 0) 
+  if (minutes < 0) 
   {
-    time_ = 100*(hours-1)
+    time_ = 100*(hours-1);
   }
   if (hours >= 24) 
   {
     time_ = 0;
   }
-  if (hours <= 0) 
+  if (hours < 0) 
   {
     time_ = 2400;
   }
-  return time;
+  return time_;
 }
 
 void matrix_time(int time_, int brightness) {
   matrix.setBrightness(brightness);
-  matrix.print(time_);    
+  if (time_ < 1000)
+  {
+    matrix.writeDigitNum(0, (time_ / 1000), false);
+    matrix.writeDigitNum(1, (time_ / 100) % 10, false);
+    matrix.writeDigitNum(3, (time_ / 10) % 10, false);
+    matrix.writeDigitNum(4, time_ % 10, false);
+  } else {
+    matrix.print(time_);    
+  }
   matrix.drawColon(true);
   matrix.writeDisplay();
+}
+
+void oled_time() {
+  DateTime now = rtc.now();
+  String time_ = String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second());
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(15,0);
+  display.println(time_);
+  display.setCursor(0, 21);
+  display.println("a1:   " + String(wake1/100) + ":" + String(wake1%100));
+  display.setCursor(0,42);
+  display.println("a2:   " + String(wake2/100) + ":" + String(wake2%100));
+  display.display();
 }
