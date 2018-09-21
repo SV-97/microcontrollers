@@ -36,12 +36,14 @@ void setup() {
 
   delay(3000); // Wait for terminal
 
-  if (! rtc.begin()) {
+  if (! rtc.begin()) 
+  {
     Serial.println("Can't find RTC");
     while (1);
   }
   
-  if (rtc.lostPower() || syncOnFirstStart) {
+  if (rtc.lostPower() || syncOnFirstStart) 
+  {
     Serial.println("Die RTC war vom Strom getrennt. Die Zeit wird neu synchronisiert.");
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
@@ -68,16 +70,14 @@ int wake1 = 1845;
 int wake2 = 1825;
 
 void loop() {
-  DateTime now = rtc.now(); // Current time
+  Datetime_ now = rtc.now(); // Current time
   int timeint = int(now.hour())*100 + int(now.minute());
+  matrix_time(timeint, 5);
   
-  matrix.setBrightness(5);
-  matrix.print(timeint);    
-  matrix.drawColon(true);
-  matrix.writeDisplay();
-  
-  if ((timeint == wake1 || timeint == wake2)) {
-    if (!buzzed) {
+  if ((timeint == wake1 || timeint == wake2)) 
+  {
+    if (!buzzed) 
+    {
       buzzed = true;
       display.clearDisplay();
       display.setCursor(0,0);
@@ -88,22 +88,25 @@ void loop() {
       buzz(5);
     }
   } else {
-    if (buzzed) {
+    if (buzzed) 
+    {
       buzzed = false;  
       matrix.blinkRate(0);
       matrix.setBrightness(1);
     }
   }
 
-  String time = String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second());
+  String time_ = String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second());
   display.clearDisplay();
   display.setTextSize(2);
   display.setTextColor(WHITE);
   display.setCursor(0,0);
   display.println(time);
   display.display();
-  if (digitalRead(button3_menu) == HIGH) {
+  if (digitalRead(button3_menu) == HIGH) 
+  {
     buzz(2);
+    menu();
   }
 }
 
@@ -115,4 +118,99 @@ void buzz(int n) {
     digitalWrite(buzzer, LOW);
     delay(500);
   }
+}
+
+void menu() {
+  int from_right = 0;
+  int time_ = 0600;
+  bool button3_state = true;
+  while(true) 
+  {
+    int grow = 1;
+    int grow_counter = 0;
+    while(digitalRead(button1_up) == HIGH) 
+    {
+      time_ = over_underflow(time);
+      if ( grow_counter > 5 && grow < 20) 
+      {
+         grow += 5;
+         grow_counter = 0;
+      } else {
+        grow_counter++;
+      }
+      time_ += grow*10^from_right;
+      delay(100);
+    }
+    grow = 1;
+    while(digitalRead(button2_down) == HIGH) 
+    {
+      time_ = over_underflow(time);
+      if ( grow_counter > 5 && grow < 20) 
+      {
+         grow += 5;
+         grow_counter = 0;
+      } else {
+        grow_counter++;
+      }
+      time_ -= grow*10^from_right;
+      delay(100);
+    }
+    if(digitalRead(button4_left) == HIGH)
+    {
+      from_right++;
+      if(from_right > 3)
+      {
+        from_right = 3;
+      }
+    }
+    if(digitalRead(button5_right) == HIGH)
+    {
+      from_right--;
+      if(from_right < 0)
+      {
+        from_right = 0;
+      }
+    }
+    matrix_time(time_, 15);
+    if(digitalRead(button3_menu) == HIGH)
+    {
+      if(!button3_state) 
+      {
+        wake2 = wake1;
+        wake1 = time_;
+        return;
+      }
+    } else {
+      button3_state = false;
+    }
+  }
+}
+
+int over_underflow(int time) {
+  int hours = time/100;
+  int minutes = time%100;
+  if (minutes >= 60) 
+  {
+      time_ = 100*(hours+1)
+  }
+  if (minutes <= 0) 
+  {
+    time_ = 100*(hours-1)
+  }
+  if (hours >= 24) 
+  {
+    time_ = 0;
+  }
+  if (hours <= 0) 
+  {
+    time_ = 2400;
+  }
+  return time;
+}
+
+void matrix_time(int time_, int brightness) {
+  matrix.setBrightness(brightness);
+  matrix.print(time_);    
+  matrix.drawColon(true);
+  matrix.writeDisplay();
 }
