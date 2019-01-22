@@ -15,12 +15,12 @@ main:		ldi r16, low(RAMEND)
 			out SPH, r16
 
 mainloop:	wdr
-			;ldi r16, 0xFF
-			;out DDRB, r16
-			;ldi r16, 0b00000001
-			;com r16
-			;out portb, r16
-			sbi DDRB, 0
-			cbi portB, 0
+			ldi r16, 0xFF
+			out DDRB, r16
+			ldi r16, 0b00000001
+			com r16
+			out portb, r16
+			;sbi DDRB, 0
+			;cbi portB, 0
 			rjmp mainloop
 

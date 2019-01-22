@@ -1,0 +1,31 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.7</VERSION>
+ <DEVICE>"ATmega32A"</DEVICE>
+ <WORKING_DIR>C:\Users\volzs\Documents\Atmel Studio\7.0\006_Interrupts\006_Interrupts\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\volzs\Documents\Atmel Studio\7.0\006_Interrupts\006_Interrupts\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\avrasm\inc\m32adef.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\volzs\Documents\Atmel Studio\7.0\006_Interrupts\006_Interrupts\Debug\006_Interrupts.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>006_Interrupts.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>006_Interrupts.map</FILE>
+  <FILE>006_Interrupts.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <main><FILE>C:\Users\volzs\Documents\Atmel Studio\7.0\006_Interrupts\006_Interrupts\main.asm</FILE><LINE>9</LINE></main>
+  <interrupt1><FILE>C:\Users\volzs\Documents\Atmel Studio\7.0\006_Interrupts\006_Interrupts\main.asm</FILE><LINE>43</LINE></interrupt1>
+  <mainloop><FILE>C:\Users\volzs\Documents\Atmel Studio\7.0\006_Interrupts\006_Interrupts\main.asm</FILE><LINE>28</LINE></mainloop>
+  <delay><FILE>C:\Users\volzs\Documents\Atmel Studio\7.0\006_Interrupts\006_Interrupts\main.asm</FILE><LINE>35</LINE></delay>
+  <del1><FILE>C:\Users\volzs\Documents\Atmel Studio\7.0\006_Interrupts\006_Interrupts\main.asm</FILE><LINE>37</LINE></del1>
+ </LABELS>
+</ASSEMBLER_INFO>
